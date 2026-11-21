@@ -1,0 +1,176 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>우리 가족 언제와요?</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#fff6ec;color:#514338;font-family:Arial,'Malgun Gothic',sans-serif}
+header{text-align:center;background:#ffe4d6;padding:24px 12px;border-radius:0 0 28px 28px}
+h1{font-size:27px;margin:8px 0}
+h2{font-size:20px;margin:0 0 14px}
+p{line-height:1.5}
+main{max-width:850px;margin:auto;padding:16px}
+.card{background:white;border-radius:22px;padding:20px;margin-bottom:15px;box-shadow:0 3px 12px #9c80621a}
+.people{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.person{text-align:center;background:#f8f5ff;border-radius:17px;padding:15px}
+.emoji{font-size:46px}
+.status{font-weight:bold;color:#7463a7}
+button,input{font:inherit}
+button{border:0;border-radius:12px;background:#e7d9ff;padding:12px;margin:4px;cursor:pointer;color:#44375b}
+button:active{transform:scale(.97)}
+input{padding:10px;border:1px solid #ddd;border-radius:10px;max-width:100%}
+.controls{display:flex;flex-wrap:wrap;gap:5px}
+.road{height:90px;background:#e6f4e7;border-radius:18px;display:flex;align-items:center;justify-content:space-around;font-size:38px;margin:12px 0}
+.big{font-size:28px;font-weight:bold;color:#8766b3}
+.small{font-size:13px;color:#897c71}
+.message{background:#fff0c9;padding:12px;border-radius:12px;margin-top:10px}
+footer{text-align:center;padding:20px;color:#97877b}
+@media(max-width:420px){h1{font-size:23px}.card{padding:15px}.emoji{font-size:37px}}
+</style>
+</head>
+<body>
+<header>
+<div style="font-size:36px">🏡💕</div>
+<h1>엄마 아빠 언제와요?</h1>
+<div id="clock"></div>
+<p>서우와 서준이의 우리 가족 보드 ❤️</p>
+</header>
+<main>
+<section class="card">
+<h2>👨‍👩‍👧‍👦 우리 가족은 지금?</h2>
+<div class="people">
+<div class="person">
+<div class="emoji">👩</div>
+<h3>엄마</h3>
+<p class="status" id="momStatus">🏠 집에 있어요</p>
+</div>
+<div class="person">
+<div class="emoji">👨</div>
+<h3>아빠</h3>
+<p class="status" id="dadStatus">💼 일하는 중</p>
+</div>
+</div>
+<details>
+<summary>⚙️ 엄마 아빠 상태 바꾸기</summary>
+<p>엄마 상태</p>
+<div class="controls">
+<button onclick="change('mom','🏠 집에 있어요')">집</button>
+<button onclick="change('mom','👩‍🏫 수업 중')">수업</button>
+<button onclick="change('mom','🚗 집에 가는 중')">귀가</button>
+</div>
+<p>아빠 상태</p>
+<div class="controls">
+<button onclick="change('dad','💼 일하는 중')">회사</button>
+<button onclick="change('dad','🚗 집에 가는 중')">귀가</button>
+<button onclick="change('dad','🏠 집에 도착')">도착</button>
+</div>
+</details>
+</section>
+
+<section class="card">
+<h2>🚗 아빠가 집에 오는 길</h2>
+<div class="road">
+<span>🏢</span><span id="car">🚙</span><span>🏡</span>
+</div>
+<p>아빠 도착 예정 시간</p>
+<input type="time" id="arrival" value="19:30">
+<button onclick="saveArrival()">시간 설정</button>
+<p class="big" id="arrivalText">도착 시간을 설정해 주세요</p>
+<p class="small">자동차는 예상 시간에 따라 움직일 예정이에요.</p>
+</section>
+
+<section class="card">
+<h2>👩‍🏫 엄마는 수업 중이에요!</h2>
+<p>📚 오늘 남은 학생</p>
+<div class="big"><span id="students">4</span>명</div>
+<button onclick="student(-1)">수업 1명 완료 ✓</button>
+<button onclick="student(1)">1명 추가 +</button>
+<p>☕ 다음 쉬는 시간</p>
+<input type="time" id="breakTime" value="17:30">
+<button onclick="saveBreak()">쉬는 시간 설정</button>
+<p id="breakText">쉬는 시간을 설정해 주세요</p>
+<p>🏡 오늘 수업 종료 예정</p>
+<input type="time" id="endTime" value="20:00">
+<button onclick="saveEnd()">종료 시간 설정</button>
+<p id="endText">종료 시간을 설정해 주세요</p>
+</section>
+
+<section class="card">
+<h2>💌 엄마 아빠에게 말하기</h2>
+<div class="controls">
+<button onclick="send('❤️ 보고 싶어요!')">❤️ 보고 싶어요</button>
+<button onclick="send('🍚 배고파요!')">🍚 배고파요</button>
+<button onclick="send('🥰 사랑해요!')">🥰 사랑해요</button>
+<button onclick="send('🎮 같이 놀아요!')">🎮 같이 놀아요</button>
+</div>
+<div class="message" id="message">어떤 말을 전하고 싶나요? 💕</div>
+</section>
+</main>
+<footer>우리 가족만의 따뜻한 공간 🏡</footer>
+<script>
+const $=id=>document.getElementById(id);
+function clock(){
+$('clock').textContent=new Date().toLocaleString('ko-KR',{
+dateStyle:'full',timeStyle:'medium'
+});
+}
+setInterval(clock,1000);clock();
+
+function change(person,value){
+localStorage.setItem(person+'Status',value);
+$(person+'Status').textContent=value;
+}
+function student(n){
+let count=Math.max(0,Number($('students').textContent)+n);
+$('students').textContent=count;
+localStorage.setItem('students',count);
+}
+function saveArrival(){
+localStorage.setItem('arrival',$('arrival').value);
+updateArrival();
+}
+function updateArrival(){
+let t=$('arrival').value;
+let now=new Date();
+let target=new Date();
+let [h,m]=t.split(':').map(Number);
+target.setHours(h,m,0,0);
+let minutes=Math.ceil((target-now)/60000);
+$('arrivalText').textContent=minutes>0
+?'약 '+minutes+'분 남았어요 💕'
+:'예정 시간이 지났어요. 도착 여부를 확인해 주세요.';
+}
+function saveBreak(){
+localStorage.setItem('breakTime',$('breakTime').value);
+$('breakText').textContent='쉬는 시간: '+$('breakTime').value;
+}
+function saveEnd(){
+localStorage.setItem('endTime',$('endTime').value);
+$('endText').textContent='수업 종료: '+$('endTime').value;
+}
+function send(msg){
+$('message').textContent=msg;
+}
+function restore(){
+['mom','dad'].forEach(p=>{
+let v=localStorage.getItem(p+'Status');
+if(v)$(p+'Status').textContent=v;
+});
+let n=localStorage.getItem('students');
+if(n!==null)$('students').textContent=n;
+['arrival','breakTime','endTime'].forEach(id=>{
+let v=localStorage.getItem(id);
+if(v)$(id).value=v;
+});
+updateArrival();
+saveBreak();
+saveEnd();
+}
+restore();
+setInterval(updateArrival,30000);
+</script>
+</body>
+</html>
