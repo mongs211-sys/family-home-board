@@ -41,8 +41,9 @@ window.closeLogin=()=>{$('loginDialog').close();};
 $('loginForm').addEventListener('submit',async e=>{e.preventDefault();$('loginError').textContent='';try{await signInWithEmailAndPassword(auth,$('loginEmail').value.trim(),$('loginPassword').value);$('loginPassword').value='';closeLogin();}catch(err){$('loginError').textContent='로그인에 실패했어요. 이메일과 비밀번호를 확인해 주세요. ('+err.code+')';}});
 onAuthStateChanged(auth,user=>{currentUser=user;updateControls();});
 onValue(familyRef,snap=>{connected=true;state={...defaults,...(snap.val()||{})};render();updateControls();},err=>{$('authState').textContent='⚠️ 연결 실패: '+err.message;});
-function showError(err){alert('저장하지 못했어요. 로그인과 인터넷 연결을 확인해 주세요.
-'+(err.code||err.message||''));}
+function showError(err){
+  alert('저장하지 못했어요. 로그인과 인터넷 연결을 확인해 주세요.\n' + (err.code || err.message || ''));
+}
 async function saveField(key,value){if(!isParent())return alert('엄마 아빠만 수정할 수 있어요.');try{await set(ref(db,'family/'+key),value);}catch(err){showError(err);}}
 window.change=(person,value)=>saveField(person+'Status',value);
 window.student=async n=>{if(!isParent())return;try{await runTransaction(ref(db,'family/students'),v=>Math.max(0,(Number.isFinite(Number(v))&&v!==null?Number(v):state.students)+n));}catch(err){showError(err);}};
